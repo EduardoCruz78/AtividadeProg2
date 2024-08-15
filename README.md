@@ -1,15 +1,27 @@
-copie e cole esses comandos todos de uma vez no terminal:
 
+# Projeto Node.js com Express, SQLite e TypeScript
+
+## Passos para Configuração do Projeto
+
+### 1. Inicialização do Projeto
+
+Copie e cole estes comandos todos de uma vez no terminal:
+
+```
 npm init -y
 npm install express cors sqlite3 sqlite
 npm install --save-dev typescript nodemon ts-node @types/express @types/cors
 npx tsc --init
 mkdir src
+```
 
-dentro da pasta src crie um arquivo chamado app.ts
+### 2. Criação de Arquivos
 
-cole isso dentro do tsconfig.json
+#### Dentro da pasta `src`, crie um arquivo chamado `app.ts`.
 
+#### Cole isso dentro do `tsconfig.json`:
+
+```json
 {
   "compilerOptions": {
     "target": "ES2017",
@@ -22,17 +34,19 @@ cole isso dentro do tsconfig.json
     "forceConsistentCasingInFileNames": true
   }
 }
+```
 
-cole esse código dentro do package.json
+#### Cole esse código dentro do `package.json`:
 
+```json
 {
   "name": "atvprog2",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-  "dev": "npx nodemon src/app.ts"
-},
+    "dev": "npx nodemon src/app.ts"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -50,11 +64,13 @@ cole esse código dentro do package.json
     "typescript": "^5.5.3"
   }
 }
+```
 
-crie um arquivo chamado database.ts na pasta src
+#### Crie um arquivo chamado `database.ts` na pasta `src`.
 
-cole isso dentro do database.ts
+#### Cole isso dentro do `database.ts`:
 
+```ts
 import { open, Database } from 'sqlite';
 import sqlite3 from 'sqlite3';
 
@@ -62,75 +78,80 @@ let instance: Database | null = null;
 
 export async function connect() {
   if (instance !== null) 
-      return instance;
+    return instance;
 
   const db = await open({
-     filename: './src/database.sqlite',
-     driver: sqlite3.Database
-   });
+    filename: './src/database.sqlite',
+    driver: sqlite3.Database
+  });
   
-  await db.exec(`
+  await db.exec(\`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT,
       email TEXT
     )
-  `);
+  \`);
 
   instance = db;
   return db;
 }
+```
 
-cole esse código dentro do app.ts
+#### Cole esse código dentro do `app.ts`:
 
-import express from 'express'
-import cors from 'cors'
-import { connect } from './database'
+```ts
+import express from 'express';
+import cors from 'cors';
+import { connect } from './database';
 
-const port = 3333
-const app = express()
+const port = 3333;
+const app = express();
 
-app.use(cors())
-app.use(express.json())
-app.use(express.static(__dirname + '/../public'))
+app.use(cors());
+app.use(express.json());
+app.use(express.static(__dirname + '/../public'));
 
 app.get('/users', async (req, res) => {
-  const db = await connect()
-  const users = await db.all('SELECT * FROM users')
-  res.json(users)
-})
+  const db = await connect();
+  const users = await db.all('SELECT * FROM users');
+  res.json(users);
+});
 
 app.post('/users', async (req, res) => {
-  const db = await connect()
-  const { name, email } = req.body
-  const result = await db.run('INSERT INTO users (name, email) VALUES (?, ?)', [name, email])
-  const user = await db.get('SELECT * FROM users WHERE id = ?', [result.lastID])
-  res.json(user)
-})
+  const db = await connect();
+  const { name, email } = req.body;
+  const result = await db.run('INSERT INTO users (name, email) VALUES (?, ?)', [name, email]);
+  const user = await db.get('SELECT * FROM users WHERE id = ?', [result.lastID]);
+  res.json(user);
+});
 
 app.put('/users/:id', async (req, res) => {
-  const db = await connect()
-  const { name, email } = req.body
-  const { id } = req.params
-  await db.run('UPDATE users SET name = ?, email = ? WHERE id = ?', [name, email, id])
-  const user = await db.get('SELECT * FROM users WHERE id = ?', [id])
-  res.json(user)
-})
+  const db = await connect();
+  const { name, email } = req.body;
+  const { id } = req.params;
+  await db.run('UPDATE users SET name = ?, email = ? WHERE id = ?', [name, email, id]);
+  const user = await db.get('SELECT * FROM users WHERE id = ?', [id]);
+  res.json(user);
+});
 
 app.delete('/users/:id', async (req, res) => {
-  const db = await connect()
-  const { id } = req.params
-  await db.run('DELETE FROM users WHERE id = ?', [id])
-  res.json({ message: 'User deleted' })
-})
+  const db = await connect();
+  const { id } = req.params;
+  await db.run('DELETE FROM users WHERE id = ?', [id]);
+  res.json({ message: 'User deleted' });
+});
 
 app.listen(port, () => {
-  console.log(`Server running on port ${port}`)
-})
+  console.log(\`Server running on port \${port}\`);
+});
+```
 
+### 3. Teste com `test.http`
 
-crie um arquivo fora de tudo chamado test.http e cole isso:
+Crie um arquivo fora de tudo chamado `test.http` e cole isso:
 
+```
 POST http://localhost:3333/users HTTP/1.1
 content-type: application/json
 
@@ -152,9 +173,13 @@ content-type: application/json
 ####
 
 DELETE http://localhost:3333/users/1 HTTP/1.1
+```
 
-crie uma pasta chamada public e crie um arquivo chamado index.html dentro dela e cole esse código:
+### 4. Criação da Pasta Public
 
+Crie uma pasta chamada `public` e crie um arquivo chamado `index.html` dentro dela e cole esse código:
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 
@@ -230,7 +255,7 @@ crie uma pasta chamada public e crie um arquivo chamado index.html dentro dela e
         const btEditar = tr.querySelector('button.editar')
 
         btExcluir.addEventListener('click', async () => {
-          await fetch(`/users/${user.id}`, { method: 'DELETE' })
+          await fetch(\`/users/\${user.id}\`, { method: 'DELETE' })
           tr.remove()
         })
 
@@ -238,7 +263,7 @@ crie uma pasta chamada public e crie um arquivo chamado index.html dentro dela e
           const name = prompt('Novo nome:', user.name)
           const email = prompt('Novo email:', user.email)
 
-          await fetch(`/users/${user.id}`, {
+          await fetch(\`/users/\${user.id}\`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, email })
@@ -256,10 +281,18 @@ crie uma pasta chamada public e crie um arquivo chamado index.html dentro dela e
 </body>
 
 </html>
+```
 
+### 5. Iniciando o Servidor
 
-abra o terminal e cole 
+Abra o terminal e cole o comando:
 
+```
 npm run dev
+```
 
-e abra o navegador e cole o link
+Depois, abra o navegador e acesse:
+
+```
+http://localhost:3333
+```
