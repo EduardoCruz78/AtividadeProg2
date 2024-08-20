@@ -1,11 +1,11 @@
 
-# Projeto Node.js com Express, SQLite e TypeScript
+# Projeto Node.js com Express, SQLite e TypeScript. antes de começar o tutorial pergunte ao Varela se o node está instalado no computador, caso não. baixe no site https://nodejs.org/pt ou procure no google: node download e baixe no primeiro link.
 
 ## Passos para Configuração do Projeto
 
 ### 1. Inicialização do Projeto
 
-Copie e cole estes comandos todos de uma vez no terminal:
+Copie e cole estes comandos todos de uma vez no terminal(para abrir o terminal, clique ctrl aspas):
 
 ```
 npm init -y
